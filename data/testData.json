@@ -1,0 +1,32 @@
+{
+    "login": {
+        "username": "automation-test@gmail.com",
+        "password": "123456"
+    },
+    "scenarios": [
+        {
+            "name": "Books under 50",
+            "query": "book",
+            "maxPrice": 50,
+            "limit": 2
+        },
+        {
+            "name": "Computer under 2000",
+            "query": "computer",
+            "maxPrice": 2000,
+            "limit": 3
+        },
+        {
+            "name": "Jewelry under 1500",
+            "query": "jewelry",
+            "maxPrice": 1500,
+            "limit": 3
+        },
+        {
+            "name": "Phone under 500",
+            "query": "phone",
+            "maxPrice": 500,
+            "limit": 2
+        }
+    ]
+}
