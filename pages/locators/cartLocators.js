@@ -1,4 +1,9 @@
 export default {
+    cartItemSubtotalLabels: [
+        'tr.cart-item-row td.subtotal .product-subtotal',
+        'tr.cart-item-row td.subtotal',
+        'table.cart tbody tr td:nth-child(6)',
+    ],
     cartTotalLabel: [
         'td.cart-total-right .product-price',
         'tr.order-total .product-price',

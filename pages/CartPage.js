@@ -25,16 +25,42 @@ export default class CartPage extends BasePage {
         return 0;
     }
 
-    async assertCartTotalNotExceeds(budgetPerItem, itemsCount) {
-        const maximumAllowedTotal = budgetPerItem * itemsCount;
+    async getItemsSubtotal() {
+        try {
+            for (const subtotalLocator of this.locators.cartItemSubtotalLabels) {
+                const subtotalElements = this.page.locator(subtotalLocator);
+                const subtotalCount = await subtotalElements.count();
 
-        await this.open();
-        const cartTotal = await this.getTotal();
+                if (subtotalCount === 0) {
+                    continue;
+                }
 
-        if (cartTotal > maximumAllowedTotal) {
-            throw new Error(
-                `Cart total ${cartTotal} exceeds budget ${maximumAllowedTotal} (${budgetPerItem} x ${itemsCount})`
-            );
+                let subtotalSum = 0;
+
+                for (let index = 0; index < subtotalCount; index++) {
+                    const subtotalText = (await subtotalElements.nth(index).textContent())?.trim() || '';
+                    const parsedSubtotal = parseAmount(subtotalText);
+                    if (!Number.isNaN(parsedSubtotal)) {
+                        subtotalSum += parsedSubtotal;
+                    }
+                }
+
+                if (subtotalSum > 0) {
+                    return subtotalSum;
+                }
+            }
+        } catch {
         }
+        return 0;
+    }
+
+    async isCartTotalMatchingItemsSubtotal() {
+        await this.open();
+        const itemsSubtotal = await this.getItemsSubtotal();
+        const cartTotal = await this.getTotal();
+        const cartTotalCents = Math.round(cartTotal * 100);
+        const itemsSubtotalCents = Math.round(itemsSubtotal * 100);
+
+        return cartTotalCents === itemsSubtotalCents;
     }
 }

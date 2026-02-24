@@ -67,7 +67,7 @@ export default class ProductPage extends BasePage {
         await this.selectVariants();
 
         try {
-            await this.click(this.locators.addToCartButton, { timeout: 5000 });
+            await this.click(this.locators.addToCartButton);
             await this.page.waitForLoadState('domcontentloaded').catch(() => { });
             await this.page.waitForTimeout(2000);
             return true;

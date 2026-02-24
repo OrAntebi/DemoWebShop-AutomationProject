@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const runId = process.env.RUN_ID || new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-const reportsDir = process.env.REPORTS_DIR || path.resolve('reports', runId);
+const runId = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+const reportsDir = path.resolve('reports', runId);
 
 export default class Logger {
     constructor(context = 'General') {

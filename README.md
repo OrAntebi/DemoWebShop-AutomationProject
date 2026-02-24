@@ -1,90 +1,67 @@
-# E2E Automation Framework - Playwright + JS
+# DemoWebShop Automation Project
 
-## Overview
-E2E automation for demowebshop.tricentis.com using Playwright with POM, OOP, Data-Driven tests, smart locators, retry/backoff, and parallel runs.
+Business-focused E2E automation project for https://demowebshop.tricentis.com using Playwright + JavaScript.
 
-## Features
-- Smart locators with fallback attempts from `BasePage.find`
-- Clear locator logs (`Locator OK/FAIL [attempt/total]`)
-- Retry with exponential backoff for actions (`safeClick`, `safeFill`)
-- Search with price filter + pagination + XPath-based item extraction
-- Add-to-cart with random variant selection
-- Cart validation with threshold assertion
-- Parallel execution and multi-browser matrix by environment
-- Unique reports folder per run (HTML + JUnit)
+## 1) How to Run
 
-## Prerequisites
+### Prerequisites
 - Node.js 18+
+- npm
+- Playwright browser binaries
 
-## Installation
+### Installation
 ```bash
 npm install
 npx playwright install
 ```
 
-## Configuration
-Environment variables (see .env.example):
-- `BASE_URL`: Target website URL
-- `TIMEOUT`: Test timeout in ms
-- `RETRIES`: Number of retries
-- `WORKERS`: Number of parallel workers
-- `HEADLESS`: `true` / `false`
-- `BROWSERS`: comma-separated browser list (`chromium,firefox,edge`)
-- `REPORTS_DIR`: Reports root folder
-- `RUN_ID`: Optional run identifier
-- `GRID_URL` / `PW_WS_ENDPOINT`: Optional remote Playwright websocket endpoint
-
-## Usage
+### Execution Commands
 ```bash
 npm test
 npm run test:headed
 npm run report
 ```
 
-Examples:
-```bash
-# Run chromium + firefox
-BROWSERS=chromium,firefox npm test
+### Current Runtime Configuration
+The current project uses fixed configuration values in code (`playwright.config.js`):
 
-# Run with custom report root
-REPORTS_DIR=reports RUN_ID=interview-1 npm test
-```
+- Base URL: `https://demowebshop.tricentis.com`
+- Browser project: `chromium`
+- Workers: `3`
+- Retries: `2`
+- Test timeout: `60000ms`
+- Action timeout: `15000ms`
+- Default mode: `headless: true`
 
-## Project Structure
-- `tests/` - Test specs (e2e.spec.js, login.spec.js)
-- `fixtures/` - Playwright fixtures (pageFixtures.js)
-- `pages/` - Page Object classes
-- `pages/locators/` - Element locator definitions
-- `data/testData.json` - Test data
-- `utils/` - Logger, parsers, retry logic
+## 2) Architecture (Short)
 
-## Main Functions
-- `login(username, password)` - User authentication
-- `searchItemsByNameUnderPrice(query, maxPrice, limit)` - Search and filter items
-- `addItemsToCart(urls)` - Add multiple items to cart
-- `assertCartTotalNotExceeds(budgetPerItem, itemsCount)` - Verify cart total
+The project follows POM (Page Object Model) with clear separation between business assertions (tests) and technical UI handling (page objects).
 
-## Reporting
-- HTML report: `reports/<run-id>/html`
-- JUnit XML: `reports/<run-id>/junit.xml`
-- Test artifacts: `reports/<run-id>/test-results`
+- `tests/` - business scenarios (`e2e.spec.js`, `login.spec.js`)
+- `fixtures/` - custom Playwright fixtures that inject page objects
+- `pages/` - page objects with reusable business actions
+- `pages/locators/` - locator maps per page
+- `data/testData.json` - data-driven scenarios and login credentials
+- `config/` - framework runtime settings
+- `utils/` - shared helpers (logger, retry, parsers)
 
-## Assumptions / Limitations
-- Target site is demo store content and may change.
-- Some products can miss `Add to cart` button and are skipped gracefully.
-- `GRID_URL`/`PW_WS_ENDPOINT` is for Playwright websocket-based remote execution.
+Core flow summary:
+- `HomePage` + `SearchResultsPage`: search and filter products by query + max price
+- `ProductPage`: add selected products to cart
+- `CartPage`: retrieve cart financial summary and cart consistency result
+- `e2e.spec.js`: validates business outcomes (items added, cart totals consistent)
 
-## Architecture
-- **BasePage** - Common functionality, smart locators, retry logic
-- **Page Classes** - Specific page implementations
-- **Fixtures** - Playwright built-in fixture pattern
-- **POM** - Page Object Model pattern
-- **Data-Driven** - JSON-based test data
+## 3) Limitations / Assumptions
 
-## CI
-Run in CI the same way:
-```bash
-npm ci
-npx playwright install --with-deps
-npm test
-```
+- Target website is a public demo store; DOM/content may change and affect test stability.
+- Search-based scenarios rely on live catalog data; if no eligible items exist, scenario is skipped.
+- Login test assumes credentials are provided in `data/testData.json`; if `username` is missing, login test is skipped.
+- Currency handling is numeric parsing only from UI text; no currency conversion or locale conversion is applied.
+- Product options are selected dynamically; some products may still fail add-to-cart and are handled gracefully.
+
+## 4) Reports
+
+Each run creates a unique report folder under `reports/<run-id>/`:
+
+- Playwright HTML report: `reports/<run-id>/html`
+- Test artifacts (screenshots/videos/traces/output): `reports/<run-id>/test-results`

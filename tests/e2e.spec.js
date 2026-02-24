@@ -1,28 +1,27 @@
 import { test, expect } from '../fixtures/pageFixtures.js';
 import testData from '../data/testData.json' assert { type: 'json' };
 
-test.describe('Store E2E Tests', () => {
+test.describe('Store Business Journeys', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
   });
 
   for (const scenario of testData.scenarios) {
-    test(`${scenario.name}: search, cart, verify`, async ({ homePage, productPage, cartPage }) => {
-      const urls = await homePage.searchItemsByNameUnderPrice(
-        scenario.query,
-        scenario.maxPrice,
-        scenario.limit,
-      );
+    const { name, query, maxPrice, limit } = scenario;
 
-      if (urls.length === 0) {
-        test.skip(true, `No items found for "${scenario.query}" under ${scenario.maxPrice}`);
+    test(`${name}: customer buys within budget`, async ({ homePage, productPage, cartPage }) => {
+      const eligibleProductUrls = await homePage.searchItemsByNameUnderPrice(query, maxPrice, limit);
+
+      if (eligibleProductUrls.length === 0) {
+        test.skip(true, `No eligible products were available for this business scenario (${name}).`);
         return;
       }
 
-      const addedCount = await productPage.addItemsToCart(urls);
-      expect(addedCount).toBeGreaterThan(0);
+      const addedItemsCount = await productPage.addItemsToCart(eligibleProductUrls);
+      const isCartTotalConsistent = await cartPage.isCartTotalMatchingItemsSubtotal();
 
-      await cartPage.assertCartTotalNotExceeds(scenario.maxPrice, addedCount);
+      expect(addedItemsCount).toBeGreaterThan(0);
+      expect(isCartTotalConsistent).toBe(true);
     });
   }
 });

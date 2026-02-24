@@ -45,8 +45,6 @@ export default class SearchResultsPage extends BasePage {
             const resultItems = this.page.locator(productItemsXPath);
             const itemCount = await resultItems.count();
 
-            const countBeforePage = collectedUrls.length;
-
             for (let index = 0; index < itemCount && collectedUrls.length < limit; index++) {
                 try {
                     const currentItem = resultItems.nth(index);
