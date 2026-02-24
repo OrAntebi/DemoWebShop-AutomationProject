@@ -26,7 +26,7 @@ npm run report
 The current project uses fixed configuration values in code (`playwright.config.js`):
 
 - Base URL: `https://demowebshop.tricentis.com`
-- Browser projects: `chromium`, `firefox`, `webkit`, `edge`
+- Browser projects: `chromium`, `webkit`, `edge`
 - Workers: `3`
 - Retries: `2`
 - Test timeout: `60000ms`
